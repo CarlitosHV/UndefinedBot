@@ -8,11 +8,24 @@ public class GuildAudioService {
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler sendHandler;
 
+    private volatile long lastActivityTimeMillis;
+
     public GuildAudioService(AudioPlayerManager manager) {
         this.player = manager.createPlayer();
-        this.scheduler = new TrackScheduler(this.player);
+        this.lastActivityTimeMillis = System.currentTimeMillis();
+
+        this.scheduler = new TrackScheduler(this.player, this::updateActivity);
         this.player.addListener(this.scheduler);
+
         this.sendHandler = new AudioPlayerSendHandler(this.player);
+    }
+
+    private void updateActivity() {
+        lastActivityTimeMillis = System.currentTimeMillis();
+    }
+
+    public long getLastActivityTimeMillis() {
+        return lastActivityTimeMillis;
     }
 
     public AudioPlayerSendHandler getSendHandler() {

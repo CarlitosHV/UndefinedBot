@@ -13,8 +13,10 @@ import com.undefined.core.audio.GuildAudioService;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class PlayerManager {
 
@@ -85,4 +87,9 @@ public class PlayerManager {
             }
         });
     }
+
+    public Map<Long, GuildAudioService> getMusicManagers() {
+        return musicManagers;
+    }
+
 }
