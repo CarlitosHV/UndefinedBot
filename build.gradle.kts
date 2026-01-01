@@ -17,7 +17,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("net.dv8tion:JDA:5.0.0-beta.24")
+    implementation("net.dv8tion:JDA:6.2.0")
     implementation("dev.arbjerg:lavaplayer:2.2.2")
     implementation("com.github.topi314.lavasrc:lavasrc:4.8.1")
     implementation("org.slf4j:slf4j-simple:2.0.12")
