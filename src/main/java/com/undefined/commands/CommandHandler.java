@@ -1,6 +1,7 @@
 package com.undefined.commands;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,4 +23,13 @@ public class CommandHandler {
         }
         command.execute(event, args);
     }
+
+    public void registerCommand(Command command) {
+        commands.put(command.getName().toLowerCase(), command);
+    }
+
+    public List<Command> getAllCommands() {
+        return List.copyOf(commands.values());
+    }
+
 }

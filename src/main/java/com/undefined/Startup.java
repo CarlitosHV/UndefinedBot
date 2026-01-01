@@ -1,6 +1,7 @@
 package com.undefined;
 
 import com.undefined.commands.CommandHandler;
+import com.undefined.commands.basics.HelpCommand;
 import com.undefined.commands.basics.PingCommand;
 import com.undefined.commands.music.JoinCommand;
 import com.undefined.config.BotConfiguration;
@@ -44,6 +45,10 @@ public class Startup {
                         new JoinCommand(playerManager)
                 )
         );
+
+        String prefix = config.getCommandPrefix();
+        HelpCommand helpCommand = new HelpCommand(commandHandler.getAllCommands(), prefix);
+        commandHandler.registerCommand(helpCommand);
 
         jda.addEventListener(new MessageListener(config, commandHandler));
 
