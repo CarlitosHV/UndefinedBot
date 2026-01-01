@@ -20,6 +20,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-beta.24")
     implementation("dev.arbjerg:lavaplayer:2.2.2")
     implementation("com.github.topi314.lavasrc:lavasrc:4.8.1")
+    implementation("org.slf4j:slf4j-simple:2.0.12")
 }
 
 java {

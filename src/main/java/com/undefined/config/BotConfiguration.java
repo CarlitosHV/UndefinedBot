@@ -10,7 +10,7 @@ public class BotConfiguration {
         this.discordToken = System.getenv("DISCORD_TOKEN");
         this.spotifyClientId = System.getenv("SPOTIFY_CLIENT_ID");
         this.spotifyClientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
-        this.commandPrefix = System.getenv().getOrDefault("COMMAND_PREFIX", "!");
+        this.commandPrefix = System.getenv("COMMAND_PREFIX");
     }
 
     public String getDiscordToken() {
