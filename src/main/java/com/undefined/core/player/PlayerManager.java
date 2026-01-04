@@ -70,17 +70,34 @@ public class PlayerManager {
         audioPlayerManager.loadItem(identifier, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
+                boolean isPlaying = musicManager.getPlayer().getPlayingTrack() != null;
                 musicManager.getScheduler().queue(track);
-                channel.sendMessage("Estoy reproduciendo: " + track.getInfo().title).queue();
+
+                if (isPlaying) {
+                    int position = musicManager.getScheduler().getQueue().size();
+                    channel.sendMessage("Agregado a la cola: **" + track.getInfo().title +
+                            "** (posición " + position + ")").queue();
+                } else {
+                    channel.sendMessage("Reproduciendo ahora: **" + track.getInfo().title + "**").queue();
+                }
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
+                boolean isPlaying = musicManager.getPlayer().getPlayingTrack() != null;
+                int trackCount = playlist.getTracks().size();
+
                 for (AudioTrack track : playlist.getTracks()) {
                     musicManager.getScheduler().queue(track);
                 }
-                channel.sendMessage("Voy a reproducir la playlist: " + playlist.getName()
-                        + " (" + playlist.getTracks().size() + " canciones)").queue();
+
+                if (isPlaying) {
+                    channel.sendMessage("Agregadas " + trackCount + " canciones de la playlist: **" +
+                            playlist.getName() + "** a la cola").queue();
+                } else {
+                    channel.sendMessage("Reproduciendo playlist: **" + playlist.getName() +
+                            "** (" + trackCount + " canciones)").queue();
+                }
             }
 
             @Override
