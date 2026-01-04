@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("com.gradleup.shadow") version "9.2.0"
 }
 
 group = "com.undefined"
@@ -27,6 +28,17 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks {
+    shadowJar {
+        manifest {
+            attributes["Main-Class"] = "com.undefined.Startup"
+        }
+        archiveBaseName.set("undefined-bot")
+        archiveClassifier.set("")
+        archiveVersion.set("1.0")
+    }
 }
 
 tasks.test {
