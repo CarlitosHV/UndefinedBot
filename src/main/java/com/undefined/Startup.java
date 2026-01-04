@@ -60,7 +60,10 @@ public class Startup {
 
         int expiringTime = config.getIdleTimeoutMinutes();
         VoiceConnectionManager connectionManager =
-                new JdaVoiceConnectionManager(jda, Duration.ofMinutes(expiringTime));
+                new JdaVoiceConnectionManager(
+                        jda,
+                        Duration.ofMinutes(expiringTime),
+                        playerManager);
 
         VoiceIdleMonitor idleMonitor = new VoiceIdleMonitor(playerManager, connectionManager);
         idleMonitor.start();
