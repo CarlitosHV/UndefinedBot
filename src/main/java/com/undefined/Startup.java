@@ -5,6 +5,8 @@ import com.undefined.commands.basics.HelpCommand;
 import com.undefined.commands.basics.PingCommand;
 import com.undefined.commands.music.JoinCommand;
 import com.undefined.commands.music.LeaveCommand;
+import com.undefined.commands.music.PlayCommand;
+import com.undefined.commands.music.StopCommand;
 import com.undefined.config.BotConfiguration;
 import com.undefined.core.player.PlayerManager;
 import com.undefined.core.voice.VoiceIdleMonitor;
@@ -44,6 +46,8 @@ public class Startup {
                 List.of(
                         new PingCommand(),
                         new LeaveCommand(),
+                        new PlayCommand(playerManager),
+                        new StopCommand(playerManager),
                         new JoinCommand(playerManager)
                 )
         );

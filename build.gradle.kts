@@ -18,9 +18,10 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation("net.dv8tion:JDA:6.2.0")
-    implementation("dev.arbjerg:lavaplayer:2.2.2")
+    implementation("dev.arbjerg:lavaplayer:2.2.6")
     implementation("com.github.topi314.lavasrc:lavasrc:4.8.1")
-    implementation("org.slf4j:slf4j-simple:2.0.12")
+    implementation("org.slf4j:slf4j-simple:2.0.17")
+    implementation("dev.lavalink.youtube:v2:1.16.0")
 }
 
 java {

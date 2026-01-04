@@ -1,6 +1,5 @@
 package com.undefined.core.player;
 
-import com.github.topi314.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -10,13 +9,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.undefined.config.BotConfiguration;
 import com.undefined.core.audio.GuildAudioService;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class PlayerManager {
 
@@ -29,27 +27,20 @@ public class PlayerManager {
         this.audioPlayerManager = new DefaultAudioPlayerManager();
         this.musicManagers = new HashMap<>();
 
-        AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
-        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+        YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
+        this.audioPlayerManager.registerSourceManager(youtubeSource);
 
-        SpotifySourceManager spotify = new SpotifySourceManager(
-                new String[]{"ytsearch:\"%ISRC%\"", "ytsearch:%QUERY%"},
-                config.getSpotifyClientId(),
-                config.getSpotifyClientSecret(),
-                "MX",
-                audioPlayerManager
-        );
-        this.audioPlayerManager.registerSourceManager(spotify);
+        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
     }
 
-    public static PlayerManager getInstance(BotConfiguration config) {
+    public static synchronized PlayerManager getInstance(BotConfiguration config) {
         if (instance == null) {
             instance = new PlayerManager(config);
         }
         return instance;
     }
 
-    public GuildAudioService getGuildAudioService(Guild guild) {
+    public synchronized GuildAudioService getGuildAudioService(Guild guild) {
         return musicManagers.computeIfAbsent(guild.getIdLong(), id -> {
             GuildAudioService service = new GuildAudioService(audioPlayerManager);
             guild.getAudioManager().setSendingHandler(service.getSendHandler());
@@ -59,7 +50,6 @@ public class PlayerManager {
 
     public void loadAndPlay(Guild guild, TextChannel channel, String identifier) {
         GuildAudioService musicManager = getGuildAudioService(guild);
-
         audioPlayerManager.loadItem(identifier, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
@@ -84,6 +74,7 @@ public class PlayerManager {
             @Override
             public void loadFailed(FriendlyException exception) {
                 channel.sendMessage("Lo siento, he tenido un error de carga: " + exception.getMessage()).queue();
+                exception.printStackTrace();
             }
         });
     }
@@ -91,5 +82,4 @@ public class PlayerManager {
     public Map<Long, GuildAudioService> getMusicManagers() {
         return musicManagers;
     }
-
 }
