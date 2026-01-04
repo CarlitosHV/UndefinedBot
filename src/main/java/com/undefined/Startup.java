@@ -72,7 +72,8 @@ public class Startup {
                         new PauseCommand(playerManager),
                         new ResumeCommand(playerManager),
                         new SeekCommand(playerManager),
-                        new VolumeCommand(playerManager)
+                        new VolumeCommand(playerManager),
+                        new LoopCommand(playerManager)
                 )
         );
 
