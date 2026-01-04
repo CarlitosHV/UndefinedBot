@@ -3,10 +3,7 @@ package com.undefined;
 import com.undefined.commands.CommandHandler;
 import com.undefined.commands.basics.HelpCommand;
 import com.undefined.commands.basics.PingCommand;
-import com.undefined.commands.music.JoinCommand;
-import com.undefined.commands.music.LeaveCommand;
-import com.undefined.commands.music.PlayCommand;
-import com.undefined.commands.music.StopCommand;
+import com.undefined.commands.music.*;
 import com.undefined.config.BotConfiguration;
 import com.undefined.core.player.PlayerManager;
 import com.undefined.core.voice.VoiceIdleMonitor;
@@ -48,7 +45,12 @@ public class Startup {
                         new LeaveCommand(),
                         new PlayCommand(playerManager),
                         new StopCommand(playerManager),
-                        new JoinCommand(playerManager)
+                        new JoinCommand(playerManager),
+                        new SkipCommand(playerManager),
+                        new QueueCommand(playerManager),
+                        new NowPlayingCommand(playerManager),
+                        new PauseCommand(playerManager),
+                        new ResumeCommand(playerManager)
                 )
         );
 
