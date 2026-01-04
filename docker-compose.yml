@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - COMMAND_PREFIX=${COMMAND_PREFIX:-u$}
+      - TIMEOUT_MINUTES=${TIMEOUT_MINUTES:-2}
+    restart: unless-stopped
+    container_name: undefined-bot
