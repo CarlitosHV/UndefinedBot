@@ -12,6 +12,9 @@ public class TrackScheduler extends AudioEventAdapter {
     private final AudioPlayer player;
     private final BlockingQueue<AudioTrack> queue;
     private final Runnable activityCallback;
+    private boolean repeating = false;
+    private boolean repeatingQueue = false;
+    private AudioTrack lastTrack = null;
 
     public TrackScheduler(AudioPlayer player, Runnable activityCallback) {
         this.player = player;
@@ -33,7 +36,18 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void nextTrack() {
-        player.startTrack(queue.poll(), false);
+        if (repeating && lastTrack != null) {
+            player.startTrack(lastTrack.makeClone(), false);
+            markActivity();
+            return;
+        }
+
+        AudioTrack nextTrack = queue.poll();
+        if (nextTrack != null) {
+            player.startTrack(nextTrack, false);
+        } else {
+            player.stopTrack();
+        }
         markActivity();
     }
 
@@ -44,8 +58,18 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        this.lastTrack = track;
+
         if (endReason.mayStartNext) {
-            nextTrack();
+            if (repeating) {
+                player.startTrack(track.makeClone(), false);
+                markActivity();
+            } else if (repeatingQueue) {
+                queue.offer(track.makeClone());
+                nextTrack();
+            } else {
+                nextTrack();
+            }
         } else {
             markActivity();
         }
@@ -53,5 +77,21 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public BlockingQueue<AudioTrack> getQueue() {
         return queue;
+    }
+
+    public boolean isRepeating() {
+        return repeating;
+    }
+
+    public void setRepeating(boolean repeating) {
+        this.repeating = repeating;
+    }
+
+    public boolean isRepeatingQueue() {
+        return repeatingQueue;
+    }
+
+    public void setRepeatingQueue(boolean repeatingQueue) {
+        this.repeatingQueue = repeatingQueue;
     }
 }

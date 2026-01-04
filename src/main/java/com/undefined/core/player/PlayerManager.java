@@ -11,7 +11,10 @@ import com.undefined.config.BotConfiguration;
 import com.undefined.core.audio.GuildAudioService;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,22 +51,53 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(Guild guild, TextChannel channel, String identifier) {
+    public void loadAndPlay(Guild guild, TextChannel channel, String identifier, Member member) {
+        AudioManager audioManager = guild.getAudioManager();
+
+        if (!audioManager.isConnected()) {
+            GuildVoiceState voiceState = member.getVoiceState();
+
+            if (voiceState == null || !voiceState.inAudioChannel()) {
+                channel.sendMessage("¡Necesitas estar en un canal de voz para reproducir música!").queue();
+                return;
+            }
+
+            audioManager.openAudioConnection(voiceState.getChannel());
+        }
+
         GuildAudioService musicManager = getGuildAudioService(guild);
+
         audioPlayerManager.loadItem(identifier, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
+                boolean isPlaying = musicManager.getPlayer().getPlayingTrack() != null;
                 musicManager.getScheduler().queue(track);
-                channel.sendMessage("Estoy reproduciendo: " + track.getInfo().title).queue();
+
+                if (isPlaying) {
+                    int position = musicManager.getScheduler().getQueue().size();
+                    channel.sendMessage("Agregado a la cola: **" + track.getInfo().title +
+                            "** (posición " + position + ")").queue();
+                } else {
+                    channel.sendMessage("Reproduciendo ahora: **" + track.getInfo().title + "**").queue();
+                }
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
+                boolean isPlaying = musicManager.getPlayer().getPlayingTrack() != null;
+                int trackCount = playlist.getTracks().size();
+
                 for (AudioTrack track : playlist.getTracks()) {
                     musicManager.getScheduler().queue(track);
                 }
-                channel.sendMessage("Voy a reproducir la playlist: " + playlist.getName()
-                        + " (" + playlist.getTracks().size() + " canciones)").queue();
+
+                if (isPlaying) {
+                    channel.sendMessage("Agregadas " + trackCount + " canciones de la playlist: **" +
+                            playlist.getName() + "** a la cola").queue();
+                } else {
+                    channel.sendMessage("Reproduciendo playlist: **" + playlist.getName() +
+                            "** (" + trackCount + " canciones)").queue();
+                }
             }
 
             @Override
@@ -74,7 +108,6 @@ public class PlayerManager {
             @Override
             public void loadFailed(FriendlyException exception) {
                 channel.sendMessage("Lo siento, he tenido un error de carga: " + exception.getMessage()).queue();
-                exception.printStackTrace();
             }
         });
     }
