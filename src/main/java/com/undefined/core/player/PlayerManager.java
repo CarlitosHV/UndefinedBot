@@ -11,7 +11,10 @@ import com.undefined.config.BotConfiguration;
 import com.undefined.core.audio.GuildAudioService;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +51,22 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(Guild guild, TextChannel channel, String identifier) {
+    public void loadAndPlay(Guild guild, TextChannel channel, String identifier, Member member) {
+        AudioManager audioManager = guild.getAudioManager();
+
+        if (!audioManager.isConnected()) {
+            GuildVoiceState voiceState = member.getVoiceState();
+
+            if (voiceState == null || !voiceState.inAudioChannel()) {
+                channel.sendMessage("¡Necesitas estar en un canal de voz para reproducir música!").queue();
+                return;
+            }
+
+            audioManager.openAudioConnection(voiceState.getChannel());
+        }
+
         GuildAudioService musicManager = getGuildAudioService(guild);
+
         audioPlayerManager.loadItem(identifier, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
@@ -74,7 +91,6 @@ public class PlayerManager {
             @Override
             public void loadFailed(FriendlyException exception) {
                 channel.sendMessage("Lo siento, he tenido un error de carga: " + exception.getMessage()).queue();
-                exception.printStackTrace();
             }
         });
     }
