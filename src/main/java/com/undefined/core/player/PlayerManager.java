@@ -36,7 +36,10 @@ public class PlayerManager {
 
         YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
 
-        youtubeSource.useOauth2(config.getYoutubeRefreshToken(), false);
+        String refreshToken = config.getYoutubeRefreshToken();
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            youtubeSource.useOauth2(refreshToken, true);
+        }
 
         this.audioPlayerManager.registerSourceManager(youtubeSource);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
