@@ -33,8 +33,7 @@ public class PlayerManager {
 
         YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(
                 true,
-                new Music(),
-                new TvHtml5Embedded()
+                new Music()
         );
 
         String refreshToken = config.getYoutubeRefreshToken();
