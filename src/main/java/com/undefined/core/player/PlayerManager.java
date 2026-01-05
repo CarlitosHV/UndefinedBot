@@ -116,8 +116,21 @@ public class PlayerManager {
 
             @Override
             public void loadFailed(FriendlyException exception) {
-                channel.sendMessage("Lo siento, he tenido un error de carga: " + exception.getMessage()).queue();
+                String errorMessage = "Lo siento, he tenido un error de carga: " + exception.getMessage();
+
+                if (exception.getCause() != null) {
+                    errorMessage += "\nCausa: " + exception.getCause().getMessage();
+                }
+
+                channel.sendMessage(errorMessage).queue();
+
+                System.err.println("=== ERROR DE CARGA ===");
+                System.err.println("Mensaje: " + exception.getMessage());
+                System.err.println("Severity: " + exception.severity);
+                exception.printStackTrace();
+                System.err.println("======================");
             }
+
         });
     }
 
