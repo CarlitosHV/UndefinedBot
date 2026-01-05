@@ -34,8 +34,7 @@ public class PlayerManager {
         YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(
                 true,
                 new Music(),
-                new Ios(),
-                new AndroidMusic()
+                new Ios()
         );
 
         String refreshToken = config.getYoutubeRefreshToken();
