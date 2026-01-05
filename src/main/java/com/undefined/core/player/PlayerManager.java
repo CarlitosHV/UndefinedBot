@@ -34,18 +34,28 @@ public class PlayerManager {
         YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(
                 true,
                 new Music(),
-                new Tv(),
-                new AndroidMusic()
+                new TvHtml5Embedded()
         );
 
         String refreshToken = config.getYoutubeRefreshToken();
+        System.out.println("=== YOUTUBE OAUTH ===");
+        System.out.println("Token presente: " + (refreshToken != null && !refreshToken.isEmpty()));
+
         if (refreshToken != null && !refreshToken.isEmpty()) {
-            youtubeSource.useOauth2(refreshToken, true);
+            try {
+                youtubeSource.useOauth2(refreshToken, true);
+                System.out.println("OAuth2 activado");
+            } catch (Exception e) {
+                System.err.println("Error OAuth2: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
+        System.out.println("=====================");
 
         this.audioPlayerManager.registerSourceManager(youtubeSource);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
     }
+
 
     public static synchronized PlayerManager getInstance(BotConfiguration config) {
         if (instance == null) {
