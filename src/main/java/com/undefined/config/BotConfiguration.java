@@ -6,12 +6,14 @@ public class BotConfiguration {
     private final String spotifyClientSecret;
     private final String commandPrefix;
     private final int idleTimeoutMinutes;
+    private final String youtubeRefreshToken;
 
     public BotConfiguration() {
         this.discordToken = System.getenv("DISCORD_TOKEN");
         this.spotifyClientId = System.getenv("SPOTIFY_CLIENT_ID");
         this.spotifyClientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
         this.commandPrefix = System.getenv().getOrDefault("COMMAND_PREFIX", "!");
+        this.youtubeRefreshToken = System.getenv("YOUTUBE_REFRESH_TOKEN");
 
         String idleEnv = System.getenv("TIMEOUT_MINUTES");
         int idleMinutes;
@@ -41,6 +43,10 @@ public class BotConfiguration {
 
     public int getIdleTimeoutMinutes() {
         return idleTimeoutMinutes;
+    }
+
+    public String getYoutubeRefreshToken() {
+        return youtubeRefreshToken;
     }
 
     public boolean isValid() {
