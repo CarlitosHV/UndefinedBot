@@ -10,6 +10,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.undefined.config.BotConfiguration;
 import com.undefined.core.audio.GuildAudioService;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.clients.AndroidMusic;
+import dev.lavalink.youtube.clients.Music;
+import dev.lavalink.youtube.clients.TvHtml5Embedded;
+import dev.lavalink.youtube.clients.Web;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -31,8 +35,10 @@ public class PlayerManager {
         this.musicManagers = new HashMap<>();
 
         YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
-        this.audioPlayerManager.registerSourceManager(youtubeSource);
 
+        youtubeSource.useOauth2(config.getYoutubeRefreshToken(), false);
+
+        this.audioPlayerManager.registerSourceManager(youtubeSource);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
     }
 
