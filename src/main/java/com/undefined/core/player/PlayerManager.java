@@ -36,8 +36,7 @@ public class PlayerManager {
                 new Music(),
                 new Ios(),
                 new AndroidMusic(),
-                new Web(),
-                new MWeb()
+                new Web()
         );
 
         String refreshToken = config.getYoutubeRefreshToken();
