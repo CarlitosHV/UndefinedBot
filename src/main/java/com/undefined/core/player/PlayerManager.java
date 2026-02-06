@@ -1,22 +1,21 @@
 package com.undefined.core.player;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.undefined.config.BotConfiguration;
 import com.undefined.core.audio.GuildAudioService;
-import dev.lavalink.youtube.YoutubeAudioSourceManager;
-import dev.lavalink.youtube.clients.*;
+import dev.arbjerg.lavalink.client.*;
+import dev.arbjerg.lavalink.client.loadbalancing.builtin.VoiceRegionPenaltyProvider;
+import dev.arbjerg.lavalink.client.player.*;
+import dev.arbjerg.lavalink.client.player.Track;
+import dev.arbjerg.lavalink.protocol.v4.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.lang.Exception;
+import java.net.URI;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,36 +23,53 @@ public class PlayerManager {
 
     private static PlayerManager instance;
 
-    private final AudioPlayerManager audioPlayerManager;
+    private final LavalinkClient lavalinkClient;
     private final Map<Long, GuildAudioService> musicManagers;
 
     private PlayerManager(BotConfiguration config) {
-        this.audioPlayerManager = new DefaultAudioPlayerManager();
         this.musicManagers = new HashMap<>();
 
-        YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(
-                true,
-                new Music(),
-                new Ios()
+        this.lavalinkClient = new LavalinkClient(
+                getUserIdFromConfig(config)
         );
 
-        String refreshToken = config.getYoutubeRefreshToken();
-        System.out.println("=== YOUTUBE OAUTH ===");
-        System.out.println("Token presente: " + (refreshToken != null && !refreshToken.isEmpty()));
+        this.lavalinkClient.getLoadBalancer().addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            try {
-                youtubeSource.useOauth2(refreshToken, true);
-                System.out.println("OAuth2 activado");
-            } catch (Exception e) {
-                System.err.println("Error OAuth2: " + e.getMessage());
-                e.printStackTrace();
+        this.lavalinkClient.addNode(new NodeOptions.Builder()
+                .setName("main-node")
+                .setServerUri(URI.create("http://localhost:8080"))
+                .setPassword("youshallnotpass")
+                .build()
+        );
+
+        this.lavalinkClient.on(dev.arbjerg.lavalink.client.event.TrackStartEvent.class).subscribe(event -> {
+            GuildAudioService service = musicManagers.get(event.getGuildId());
+            if (service != null) {
+                service.getScheduler().onTrackStart(event.getTrack());
             }
-        }
-        System.out.println("=====================");
+        });
 
-        this.audioPlayerManager.registerSourceManager(youtubeSource);
-        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+        this.lavalinkClient.on(dev.arbjerg.lavalink.client.event.TrackEndEvent.class).subscribe(event -> {
+            GuildAudioService service = musicManagers.get(event.getGuildId());
+            if (service != null) {
+                service.getScheduler().onTrackEnd(event.getTrack(), event.getEndReason());
+            }
+        });
+    }
+
+    private long getUserIdFromConfig(BotConfiguration config) {
+        try {
+            String token = config.getDiscordToken();
+            String[] parts = token.split("\\.");
+
+            if (parts.length > 0) {
+                String idString = new String(Base64.getDecoder().decode(parts[0]));
+                return Long.parseLong(idString);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo extraer el ID del bot desde el token. Verifica tu configuración.", e);
+        }
+        return 0L;
     }
 
 
@@ -66,7 +82,7 @@ public class PlayerManager {
 
     public synchronized GuildAudioService getGuildAudioService(Guild guild) {
         return musicManagers.computeIfAbsent(guild.getIdLong(), id -> {
-            GuildAudioService service = new GuildAudioService(audioPlayerManager);
+            GuildAudioService service = new GuildAudioService(lavalinkClient, guild.getIdLong());
             guild.getAudioManager().setSendingHandler(service.getSendHandler());
             return service;
         });
@@ -87,66 +103,68 @@ public class PlayerManager {
         }
 
         GuildAudioService musicManager = getGuildAudioService(guild);
+        Link link = lavalinkClient.getOrCreateLink(guild.getIdLong());
 
-        audioPlayerManager.loadItem(identifier, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                boolean isPlaying = musicManager.getPlayer().getPlayingTrack() != null;
-                musicManager.getScheduler().queue(track);
-
-                if (isPlaying) {
-                    int position = musicManager.getScheduler().getQueue().size();
-                    channel.sendMessage("Agregado a la cola: **" + track.getInfo().title +
-                            "** (posición " + position + ")").queue();
+        link.loadItem(identifier).subscribe(itemLoadResult -> {
+            if (itemLoadResult instanceof TrackLoaded) {
+                TrackLoaded loaded = (TrackLoaded) itemLoadResult;
+                Track track = loaded.getTrack();
+                handleTrackLoaded(channel, musicManager, track);
+            } else if (itemLoadResult instanceof PlaylistLoaded) {
+                PlaylistLoaded loaded = (PlaylistLoaded) itemLoadResult;
+                handlePlaylistLoaded(channel, musicManager, loaded);
+            } else if (itemLoadResult instanceof SearchResult) {
+                SearchResult search = (SearchResult) itemLoadResult;
+                if (!search.getTracks().isEmpty()) {
+                    Track track = search.getTracks().get(0);
+                    handleTrackLoaded(channel, musicManager, track);
                 } else {
-                    channel.sendMessage("Reproduciendo ahora: **" + track.getInfo().title + "**").queue();
+                    channel.sendMessage("Lo siento, no he encontrado resultados para: " + identifier).queue();
                 }
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                boolean isPlaying = musicManager.getPlayer().getPlayingTrack() != null;
-                int trackCount = playlist.getTracks().size();
-
-                for (AudioTrack track : playlist.getTracks()) {
-                    musicManager.getScheduler().queue(track);
-                }
-
-                if (isPlaying) {
-                    channel.sendMessage("Agregadas " + trackCount + " canciones de la playlist: **" +
-                            playlist.getName() + "** a la cola").queue();
-                } else {
-                    channel.sendMessage("Reproduciendo playlist: **" + playlist.getName() +
-                            "** (" + trackCount + " canciones)").queue();
-                }
-            }
-
-            @Override
-            public void noMatches() {
+            } else if (itemLoadResult instanceof NoMatches) {
                 channel.sendMessage("Lo siento, no he encontrado resultados para: " + identifier).queue();
+            } else if (itemLoadResult instanceof LoadFailed) {
+                LoadFailed failed = (LoadFailed) itemLoadResult;
+                channel.sendMessage("Error de carga: " + failed.getException().getMessage()).queue();
             }
-
-            @Override
-            public void loadFailed(FriendlyException exception) {
-                String errorMessage = "Lo siento, he tenido un error de carga: " + exception.getMessage();
-
-                if (exception.getCause() != null) {
-                    errorMessage += "\nCausa: " + exception.getCause().getMessage();
-                }
-
-                channel.sendMessage(errorMessage).queue();
-
-                System.err.println("=== ERROR DE CARGA ===");
-                System.err.println("Mensaje: " + exception.getMessage());
-                System.err.println("Severity: " + exception.severity);
-                exception.printStackTrace();
-                System.err.println("======================");
-            }
-
         });
+    }
+
+    private void handleTrackLoaded(TextChannel channel, GuildAudioService musicManager, Track track) {
+        boolean isPlaying = musicManager.getPlayer().getTrack() != null;
+        musicManager.getScheduler().queue(track);
+
+        if (isPlaying) {
+            int position = musicManager.getScheduler().getQueue().size();
+            channel.sendMessage("Agregado a la cola: **" + track.getInfo().getTitle() +
+                    "** (posición " + position + ")").queue();
+        } else {
+            channel.sendMessage("Reproduciendo ahora: **" + track.getInfo().getTitle() + "**").queue();
+        }
+    }
+
+    private void handlePlaylistLoaded(TextChannel channel, GuildAudioService musicManager, PlaylistLoaded playlist) {
+        boolean isPlaying = musicManager.getPlayer().getTrack() != null;
+        int trackCount = playlist.getTracks().size();
+
+        for (Track track : playlist.getTracks()) {
+            musicManager.getScheduler().queue(track);
+        }
+
+        if (isPlaying) {
+            channel.sendMessage("Agregadas " + trackCount + " canciones de la playlist: **" +
+                    playlist.getInfo().getName() + "** a la cola").queue();
+        } else {
+            channel.sendMessage("Reproduciendo playlist: **" + playlist.getInfo().getName() +
+                    "** (" + trackCount + " canciones)").queue();
+        }
     }
 
     public Map<Long, GuildAudioService> getMusicManagers() {
         return musicManagers;
+    }
+
+    public LavalinkClient getLavalinkClient() {
+        return lavalinkClient;
     }
 }

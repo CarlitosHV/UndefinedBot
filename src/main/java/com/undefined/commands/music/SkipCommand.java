@@ -2,6 +2,7 @@ package com.undefined.commands.music;
 
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SkipCommand implements Command {
@@ -27,7 +28,13 @@ public class SkipCommand implements Command {
         var guild = event.getGuild();
         var musicManager = playerManager.getMusicManagers().get(guild.getIdLong());
 
-        if (musicManager == null || musicManager.getPlayer().getPlayingTrack() == null) {
+        if (musicManager == null) {
+            event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
+            return;
+        }
+
+        LavalinkPlayer player = musicManager.getPlayer();
+        if (player == null || player.getTrack() == null) {
             event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
             return;
         }

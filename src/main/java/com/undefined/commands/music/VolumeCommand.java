@@ -2,6 +2,7 @@ package com.undefined.commands.music;
 
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class VolumeCommand implements Command {
@@ -33,8 +34,9 @@ public class VolumeCommand implements Command {
         }
 
         if (args.isEmpty()) {
-            int currentVolume = musicManager.getPlayer().getVolume();
-            event.getChannel().sendMessage("🔊 Volumen actual: " + currentVolume + "%").queue();
+            LavalinkPlayer player = musicManager.getPlayer();
+            int currentVolume = (player != null) ? player.getVolume() : 100;
+            event.getChannel().sendMessage("Volumen actual: " + currentVolume + "%").queue();
             return;
         }
 
@@ -46,9 +48,11 @@ public class VolumeCommand implements Command {
                 return;
             }
 
-            musicManager.getPlayer().setVolume(volume);
+            musicManager.getLink().createOrUpdatePlayer()
+                    .setVolume(volume)
+                    .subscribe();
 
-            event.getChannel().sendMessage(" Volumen ajustado a: " + volume + "%").queue();
+            event.getChannel().sendMessage("Volumen ajustado a: " + volume + "%").queue();
 
         } catch (NumberFormatException e) {
             event.getChannel().sendMessage("Por favor proporciona un número válido entre 0 y 100.").queue();

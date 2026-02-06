@@ -25,11 +25,19 @@ public class StopCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String args) {
         var guild = event.getGuild();
-        var service = playerManager.getGuildAudioService(guild);
+        var musicManager = playerManager.getMusicManagers().get(guild.getIdLong());
 
-        service.getPlayer().stopTrack();
-        service.getScheduler().getQueue().clear();
+        if (musicManager == null) {
+            event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
+            return;
+        }
 
-        event.getChannel().sendMessage("Música detenida.").queue();
+        musicManager.getScheduler().getQueue().clear();
+
+        musicManager.getLink().createOrUpdatePlayer()
+                .setTrack(null)
+                .subscribe();
+
+        event.getChannel().sendMessage("Música detenida y cola limpiada.").queue();
     }
 }

@@ -2,9 +2,8 @@ package com.undefined.commands.music;
 
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PlayCommand implements Command {
@@ -40,18 +39,10 @@ public class PlayCommand implements Command {
 
         GuildVoiceState voiceState = member.getVoiceState();
         if (voiceState == null || !voiceState.inAudioChannel()) {
-            event.getChannel().sendMessage("¡Necesitas estar en un canal de voz para reproducir música!").queue();
+            event.getChannel().sendMessage("Necesitas estar en un canal de voz para reproducir música.").queue();
             return;
         }
 
-        AudioManager audioManager = event.getGuild().getAudioManager();
-        if (!audioManager.isConnected()) {
-            audioManager.openAudioConnection(voiceState.getChannel());
-        }
-
-        var guild = event.getGuild();
-        var channel = event.getChannel().asTextChannel();
-
-        playerManager.loadAndPlay(guild, channel, args, member);
+        playerManager.loadAndPlay(event.getGuild(), event.getChannel().asTextChannel(), args, member);
     }
 }

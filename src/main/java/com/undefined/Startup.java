@@ -62,7 +62,7 @@ public class Startup {
         CommandHandler commandHandler = new CommandHandler(
                 List.of(
                         new PingCommand(),
-                        new LeaveCommand(),
+                        new LeaveCommand(playerManager),
                         new PlayCommand(playerManager),
                         new StopCommand(playerManager),
                         new JoinCommand(playerManager),

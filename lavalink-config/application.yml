@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+
+lavalink:
+  server:
+    password: "youshallnotpass"
+    youtube:
+      clients:
+        - "WEB"
+        - "ANDROID"
+      oauth:
+        refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
+  plugins:
+    - name: "youtube"
+      dependency: "dev.lavalink.youtube:youtube-plugin:1.7.0"
+
+plugins:
+  directory: /plugins
+
+logging:
+  level:
+    dev.lavalink.youtube: INFO

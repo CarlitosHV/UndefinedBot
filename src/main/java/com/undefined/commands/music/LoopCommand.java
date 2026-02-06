@@ -26,10 +26,11 @@ public class LoopCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String args) {
         var guild = event.getGuild();
-        var musicManager = playerManager.getMusicManagers().get(guild.getIdLong());
 
-        if (musicManager == null) {
-            event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
+        var musicManager = playerManager.getGuildAudioService(guild);
+
+        if (musicManager.getPlayer().getTrack() == null && musicManager.getScheduler().getQueue().isEmpty()) {
+            event.getChannel().sendMessage("No hay música reproduciéndose para configurar el loop.").queue();
             return;
         }
 
@@ -38,7 +39,7 @@ public class LoopCommand implements Command {
         if (args.isEmpty()) {
             String currentMode = scheduler.isRepeating() ? "track" :
                     scheduler.isRepeatingQueue() ? "queue" : "off";
-            event.getChannel().sendMessage("🔁 Modo de repetición actual: **" + currentMode + "**\n" +
+            event.getChannel().sendMessage("Modo de repetición actual: **" + currentMode + "**\n" +
                     "Usa `!loop [off|track|queue]` para cambiar").queue();
             return;
         }
@@ -49,21 +50,21 @@ public class LoopCommand implements Command {
             case "off":
                 scheduler.setRepeating(false);
                 scheduler.setRepeatingQueue(false);
-                event.getChannel().sendMessage("🔁 Repetición desactivada.").queue();
+                event.getChannel().sendMessage("Repetición desactivada.").queue();
                 break;
 
             case "track":
             case "song":
                 scheduler.setRepeating(true);
                 scheduler.setRepeatingQueue(false);
-                event.getChannel().sendMessage("🔂 Repitiendo la canción actual.").queue();
+                event.getChannel().sendMessage("Repitiendo la canción actual.").queue();
                 break;
 
             case "queue":
             case "all":
                 scheduler.setRepeating(false);
                 scheduler.setRepeatingQueue(true);
-                event.getChannel().sendMessage("🔁 Repitiendo toda la cola.").queue();
+                event.getChannel().sendMessage("Repitiendo toda la cola.").queue();
                 break;
 
             default:

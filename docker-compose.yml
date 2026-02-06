@@ -1,4 +1,16 @@
 services:
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4.0.8
+    container_name: lavalink
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./lavalink-config:/opt/Lavalink/config
+    environment:
+      - _JAVA_OPTIONS=-Xmx1G
+      - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
+    restart: unless-stopped
+
   app:
     build:
       context: .
@@ -13,3 +25,5 @@ services:
       - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
     restart: unless-stopped
     container_name: undefined-bot
+    depends_on:
+      - lavalink

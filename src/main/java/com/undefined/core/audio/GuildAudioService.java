@@ -1,23 +1,23 @@
 package com.undefined.core.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.client.Link;
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
 
 public class GuildAudioService {
-    private final AudioPlayer player;
+    private final Link link;
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler sendHandler;
 
     private volatile long lastActivityTimeMillis;
 
-    public GuildAudioService(AudioPlayerManager manager) {
-        this.player = manager.createPlayer();
+    public GuildAudioService(LavalinkClient lavalinkClient, long guildId) {
+        this.link = lavalinkClient.getOrCreateLink(guildId);
         this.lastActivityTimeMillis = System.currentTimeMillis();
 
-        this.scheduler = new TrackScheduler(this.player, this::updateActivity);
-        this.player.addListener(this.scheduler);
+        this.scheduler = new TrackScheduler(this.link, this::updateActivity);
 
-        this.sendHandler = new AudioPlayerSendHandler(this.player);
+        this.sendHandler = new AudioPlayerSendHandler();
     }
 
     private void updateActivity() {
@@ -36,7 +36,11 @@ public class GuildAudioService {
         return scheduler;
     }
 
-    public AudioPlayer getPlayer() {
-        return player;
+    public LavalinkPlayer getPlayer() {
+        return link.getPlayer().block();
+    }
+
+    public Link getLink() {
+        return link;
     }
 }

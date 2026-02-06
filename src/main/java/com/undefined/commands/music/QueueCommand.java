@@ -1,8 +1,9 @@
 package com.undefined.commands.music;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
+import dev.arbjerg.lavalink.client.player.Track;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -39,8 +40,9 @@ public class QueueCommand implements Command {
             return;
         }
 
-        AudioTrack currentTrack = musicManager.getPlayer().getPlayingTrack();
-        BlockingQueue<AudioTrack> queue = musicManager.getScheduler().getQueue();
+        LavalinkPlayer player = musicManager.getPlayer();
+        Track currentTrack = (player != null) ? player.getTrack() : null;
+        BlockingQueue<Track> queue = musicManager.getScheduler().getQueue();
 
         if (currentTrack == null && queue.isEmpty()) {
             event.getChannel().sendMessage("No hay música en cola.").queue();
@@ -52,27 +54,30 @@ public class QueueCommand implements Command {
                 .setTitle("Cola de reproducción");
 
         if (currentTrack != null) {
-            long position = currentTrack.getPosition() / 1000;
-            long duration = currentTrack.getDuration() / 1000;
+            // position viene del player, no del track
+            long position = (player != null) ? player.getPosition() / 1000 : 0;
+            long duration = currentTrack.getInfo().getLength() / 1000;
+
             embed.addField("Reproduciendo ahora",
                     String.format("**%s**\n`%02d:%02d / %02d:%02d`",
-                            currentTrack.getInfo().title,
+                            currentTrack.getInfo().getTitle(),
                             position / 60, position % 60,
                             duration / 60, duration % 60),
                     false);
         }
 
         if (!queue.isEmpty()) {
-            List<AudioTrack> trackList = new ArrayList<>(queue);
+            List<Track> trackList = new ArrayList<>(queue);
             StringBuilder queueText = new StringBuilder();
 
             int max = Math.min(10, trackList.size());
             for (int i = 0; i < max; i++) {
-                AudioTrack track = trackList.get(i);
-                long duration = track.getDuration() / 1000;
+                Track track = trackList.get(i);
+                long duration = track.getInfo().getLength() / 1000;
+
                 queueText.append(String.format("`%d.` **%s** `[%02d:%02d]`\n",
                         i + 1,
-                        track.getInfo().title,
+                        track.getInfo().getTitle(),
                         duration / 60, duration % 60));
             }
 

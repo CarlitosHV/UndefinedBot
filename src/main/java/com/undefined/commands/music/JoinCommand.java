@@ -4,6 +4,7 @@ import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class JoinCommand implements Command {
 
@@ -27,7 +28,7 @@ public class JoinCommand implements Command {
     public void execute(MessageReceivedEvent event, String args) {
         var member = event.getMember();
         if (member == null || member.getVoiceState() == null) {
-            event.getChannel().sendMessage("No pude obtener el estatus de tu canal de voz :c").queue();
+            event.getChannel().sendMessage("No pude obtener el estatus de tu canal de voz.").queue();
             return;
         }
 
@@ -37,11 +38,10 @@ public class JoinCommand implements Command {
             return;
         }
 
-        var guild = event.getGuild();
-        var audioManager = event.getGuild().getAudioManager();
-        audioManager.openAudioConnection(voiceChannel);
+        playerManager.getGuildAudioService(event.getGuild());
 
-        playerManager.getGuildAudioService(guild);
+        AudioManager audioManager = event.getGuild().getAudioManager();
+        audioManager.openAudioConnection(voiceChannel);
 
         event.getChannel().sendMessage("Me conecté al canal de voz: " + voiceChannel.getName()).queue();
     }
