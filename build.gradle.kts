@@ -17,10 +17,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("net.dv8tion:JDA:6.2.0")
+    implementation("net.dv8tion:JDA:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.17")
 
-    implementation("dev.arbjerg:lavalink-client:3.2.0")
+    implementation("dev.arbjerg:lavalink-client:3.3.0")
 }
 
 java {

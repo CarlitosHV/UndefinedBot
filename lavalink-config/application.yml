@@ -1,10 +1,26 @@
 server:
-  port: 8080
+  port: 2333
   address: 0.0.0.0
 
 lavalink:
   server:
     password: "youshallnotpass"
+    sources:
+      youtube: false
+      http: true
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      nico: true
+      local: false
+    bufferDurationMs: 400
+    frameBufferDurationMs: 5000
+    youtubePlaylistLoadLimit: 6
+    playerUpdateInterval: 5
+    youtubeSearchEnabled: true
+    soundcloudSearchEnabled: true
+    gc-warnings: true
     youtube:
       clients:
         - "WEB"
@@ -13,11 +29,24 @@ lavalink:
         refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
   plugins:
     - name: "youtube"
-      dependency: "dev.lavalink.youtube:youtube-plugin:1.7.0"
+      dependency: "dev.lavalink.youtube:youtube-plugin:1.17.0"
 
 plugins:
-  directory: /plugins
+  directory: "/plugins"
 
 logging:
   level:
+    root: INFO
+    lavalink: INFO
     dev.lavalink.youtube: INFO
+  request:
+    enabled: true
+    includeClientInfo: true
+    includeHeaders: false
+    includeQueryString: true
+    includePayload: true
+    maxPayloadLength: 10000
+  logback:
+    rollingpolicy:
+      max-file-size: 1GB
+      max-history: 30

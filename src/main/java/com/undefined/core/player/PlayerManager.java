@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 
 import java.lang.Exception;
 import java.net.URI;
@@ -37,7 +37,7 @@ public class PlayerManager {
 
         this.lavalinkClient.addNode(new NodeOptions.Builder()
                 .setName("main-node")
-                .setServerUri(URI.create("http://localhost:8080"))
+                .setServerUri(URI.create("http://localhost:2333"))
                 .setPassword("youshallnotpass")
                 .build()
         );
@@ -61,17 +61,12 @@ public class PlayerManager {
         try {
             String token = config.getDiscordToken();
             String[] parts = token.split("\\.");
-
-            if (parts.length > 0) {
-                String idString = new String(Base64.getDecoder().decode(parts[0]));
-                return Long.parseLong(idString);
-            }
+            String idString = new String(Base64.getDecoder().decode(parts[0]));
+            return Long.parseLong(idString);
         } catch (Exception e) {
             throw new RuntimeException("No se pudo extraer el ID del bot desde el token. Verifica tu configuración.", e);
         }
-        return 0L;
     }
-
 
     public static synchronized PlayerManager getInstance(BotConfiguration config) {
         if (instance == null) {
@@ -89,18 +84,14 @@ public class PlayerManager {
     }
 
     public void loadAndPlay(Guild guild, TextChannel channel, String identifier, Member member) {
-        AudioManager audioManager = guild.getAudioManager();
-
-        if (!audioManager.isConnected()) {
-            GuildVoiceState voiceState = member.getVoiceState();
-
-            if (voiceState == null || !voiceState.inAudioChannel()) {
-                channel.sendMessage("¡Necesitas estar en un canal de voz para reproducir música!").queue();
-                return;
-            }
-
-            audioManager.openAudioConnection(voiceState.getChannel());
+        GuildVoiceState voiceState = member.getVoiceState();
+        if (voiceState == null || !voiceState.inAudioChannel()) {
+            channel.sendMessage("¡Necesitas estar en un canal de voz para reproducir música!").queue();
+            return;
         }
+
+        AudioChannel voiceChannel = voiceState.getChannel();
+        guild.getAudioManager().openAudioConnection(voiceChannel);
 
         GuildAudioService musicManager = getGuildAudioService(guild);
         Link link = lavalinkClient.getOrCreateLink(guild.getIdLong());
@@ -108,16 +99,14 @@ public class PlayerManager {
         link.loadItem(identifier).subscribe(itemLoadResult -> {
             if (itemLoadResult instanceof TrackLoaded) {
                 TrackLoaded loaded = (TrackLoaded) itemLoadResult;
-                Track track = loaded.getTrack();
-                handleTrackLoaded(channel, musicManager, track);
+                handleTrackLoaded(channel, musicManager, loaded.getTrack());
             } else if (itemLoadResult instanceof PlaylistLoaded) {
                 PlaylistLoaded loaded = (PlaylistLoaded) itemLoadResult;
                 handlePlaylistLoaded(channel, musicManager, loaded);
             } else if (itemLoadResult instanceof SearchResult) {
                 SearchResult search = (SearchResult) itemLoadResult;
                 if (!search.getTracks().isEmpty()) {
-                    Track track = search.getTracks().get(0);
-                    handleTrackLoaded(channel, musicManager, track);
+                    handleTrackLoaded(channel, musicManager, search.getTracks().get(0));
                 } else {
                     channel.sendMessage("Lo siento, no he encontrado resultados para: " + identifier).queue();
                 }
@@ -131,33 +120,24 @@ public class PlayerManager {
     }
 
     private void handleTrackLoaded(TextChannel channel, GuildAudioService musicManager, Track track) {
-        boolean isPlaying = musicManager.getPlayer().getTrack() != null;
         musicManager.getScheduler().queue(track);
 
-        if (isPlaying) {
-            int position = musicManager.getScheduler().getQueue().size();
-            channel.sendMessage("Agregado a la cola: **" + track.getInfo().getTitle() +
-                    "** (posición " + position + ")").queue();
+        int position = musicManager.getScheduler().getQueue().size();
+        if (position > 0) {
+            channel.sendMessage("Agregado a la cola: **" + track.getInfo().getTitle() + "** (posición " + position + ")").queue();
         } else {
             channel.sendMessage("Reproduciendo ahora: **" + track.getInfo().getTitle() + "**").queue();
         }
     }
 
     private void handlePlaylistLoaded(TextChannel channel, GuildAudioService musicManager, PlaylistLoaded playlist) {
-        boolean isPlaying = musicManager.getPlayer().getTrack() != null;
         int trackCount = playlist.getTracks().size();
 
         for (Track track : playlist.getTracks()) {
             musicManager.getScheduler().queue(track);
         }
 
-        if (isPlaying) {
-            channel.sendMessage("Agregadas " + trackCount + " canciones de la playlist: **" +
-                    playlist.getInfo().getName() + "** a la cola").queue();
-        } else {
-            channel.sendMessage("Reproduciendo playlist: **" + playlist.getInfo().getName() +
-                    "** (" + trackCount + " canciones)").queue();
-        }
+        channel.sendMessage("Reproduciendo playlist: **" + playlist.getInfo().getName() + "** (" + trackCount + " canciones)").queue();
     }
 
     public Map<Long, GuildAudioService> getMusicManagers() {
