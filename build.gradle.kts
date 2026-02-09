@@ -9,7 +9,6 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven("https://maven.topi.wtf/releases")
     maven("https://maven.lavalink.dev/releases")
 }
 
@@ -18,11 +17,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("net.dv8tion:JDA:6.2.0")
-    implementation("dev.arbjerg:lavaplayer:2.2.6")
-    implementation("com.github.topi314.lavasrc:lavasrc:4.8.1")
+    implementation("net.dv8tion:JDA:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.17")
-    implementation("dev.lavalink.youtube:v2:1.16.0")
+
+    implementation("dev.arbjerg:lavalink-client:3.3.0")
 }
 
 java {

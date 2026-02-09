@@ -2,6 +2,8 @@ package com.undefined.commands.music;
 
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.Link;
+import dev.arbjerg.lavalink.client.LinkState;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class StopCommand implements Command {
@@ -25,11 +27,22 @@ public class StopCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String args) {
         var guild = event.getGuild();
-        var service = playerManager.getGuildAudioService(guild);
+        Link link = playerManager.getLavalinkClient().getOrCreateLink(guild.getIdLong());
 
-        service.getPlayer().stopTrack();
-        service.getScheduler().getQueue().clear();
+        if (link.getState() != LinkState.CONNECTED) {
+            event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
+            return;
+        }
 
-        event.getChannel().sendMessage("Música detenida.").queue();
+        var musicManager = playerManager.getMusicManagers().get(guild.getIdLong());
+        if (musicManager != null) {
+            musicManager.getScheduler().getQueue().clear();
+        }
+
+        link.createOrUpdatePlayer()
+                .setTrack(null)
+                .subscribe();
+
+        event.getChannel().sendMessage("Música detenida y cola limpiada.").queue();
     }
 }

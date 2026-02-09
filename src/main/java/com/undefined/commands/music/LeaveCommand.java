@@ -1,9 +1,18 @@
 package com.undefined.commands.music;
 
 import com.undefined.commands.Command;
+import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.Link;
+import dev.arbjerg.lavalink.client.LinkState;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class LeaveCommand implements Command {
+
+    private final PlayerManager playerManager;
+
+    public LeaveCommand(PlayerManager playerManager) {
+        this.playerManager = playerManager;
+    }
 
     @Override
     public String getName() {
@@ -18,14 +27,16 @@ public class LeaveCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String args) {
         var guild = event.getGuild();
-        var audioManager = guild.getAudioManager();
+        Link link = playerManager.getLavalinkClient().getOrCreateLink(guild.getIdLong());
 
-        if (!audioManager.isConnected()) {
+        if (link.getState() != LinkState.CONNECTED) {
             event.getChannel().sendMessage("No estoy conectado a ningún canal de voz.").queue();
             return;
         }
 
-        audioManager.closeAudioConnection();
+        link.destroy().subscribe();
+        guild.getAudioManager().closeAudioConnection();
+
         event.getChannel().sendMessage("Desconectado del canal de voz.").queue();
     }
 }

@@ -1,8 +1,10 @@
 package com.undefined.commands.music;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.Link;
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
+import dev.arbjerg.lavalink.client.player.Track;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SeekCommand implements Command {
@@ -28,14 +30,20 @@ public class SeekCommand implements Command {
         var guild = event.getGuild();
         var musicManager = playerManager.getMusicManagers().get(guild.getIdLong());
 
-        if (musicManager == null || musicManager.getPlayer().getPlayingTrack() == null) {
+        if (musicManager == null) {
             event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
             return;
         }
 
-        AudioTrack track = musicManager.getPlayer().getPlayingTrack();
+        LavalinkPlayer player = musicManager.getPlayer();
+        if (player == null || player.getTrack() == null) {
+            event.getChannel().sendMessage("No hay música reproduciéndose.").queue();
+            return;
+        }
 
-        if (!track.isSeekable()) {
+        Track track = player.getTrack();
+
+        if (!track.getInfo().isSeekable()) {
             event.getChannel().sendMessage("Esta canción no permite avanzar/retroceder.").queue();
             return;
         }
@@ -58,14 +66,17 @@ public class SeekCommand implements Command {
                 seekPosition = seconds * 1000L;
             }
 
-            if (seekPosition < 0 || seekPosition > track.getDuration()) {
-                long duration = track.getDuration() / 1000;
+            long trackDuration = track.getInfo().getLength();
+            if (seekPosition < 0 || seekPosition > trackDuration) {
+                long duration = trackDuration / 1000;
                 event.getChannel().sendMessage(String.format("El tiempo debe estar entre 0 y %02d:%02d",
                         duration / 60, duration % 60)).queue();
                 return;
             }
 
-            track.setPosition(seekPosition);
+            musicManager.getLink().createOrUpdatePlayer()
+                    .setPosition(seekPosition)
+                    .subscribe();
 
             long position = seekPosition / 1000;
             event.getChannel().sendMessage(String.format("Posición ajustada a: %02d:%02d",

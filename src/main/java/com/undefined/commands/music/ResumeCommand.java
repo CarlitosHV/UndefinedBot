@@ -2,6 +2,7 @@ package com.undefined.commands.music;
 
 import com.undefined.commands.Command;
 import com.undefined.core.player.PlayerManager;
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ResumeCommand implements Command {
@@ -27,17 +28,26 @@ public class ResumeCommand implements Command {
         var guild = event.getGuild();
         var musicManager = playerManager.getMusicManagers().get(guild.getIdLong());
 
-        if (musicManager == null || musicManager.getPlayer().getPlayingTrack() == null) {
+        if (musicManager == null) {
             event.getChannel().sendMessage("No hay música para reanudar.").queue();
             return;
         }
 
-        if (!musicManager.getPlayer().isPaused()) {
+        LavalinkPlayer player = musicManager.getPlayer();
+        if (player == null || player.getTrack() == null) {
+            event.getChannel().sendMessage("No hay música para reanudar.").queue();
+            return;
+        }
+
+        if (!player.getPaused()) {
             event.getChannel().sendMessage("La música no está pausada.").queue();
             return;
         }
 
-        musicManager.getPlayer().setPaused(false);
+        musicManager.getLink().createOrUpdatePlayer()
+                .setPaused(false)
+                .subscribe();
+
         event.getChannel().sendMessage("Música reanudada.").queue();
     }
 }

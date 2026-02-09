@@ -35,7 +35,7 @@ public class JdaVoiceConnectionManager implements VoiceConnectionManager {
         GuildAudioService musicManager = playerManager.getMusicManagers().get(guildId);
         if (musicManager != null) {
             var player = musicManager.getPlayer();
-            if (player.getPlayingTrack() != null || !musicManager.getScheduler().getQueue().isEmpty()) {
+            if (player.getTrack() != null || !musicManager.getScheduler().getQueue().isEmpty()) {
                 return;
             }
         }
