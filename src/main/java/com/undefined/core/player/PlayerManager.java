@@ -27,6 +27,9 @@ public class PlayerManager {
     private final Map<Long, GuildAudioService> musicManagers;
 
     private PlayerManager(BotConfiguration config) {
+        String lavalinkHost = System.getenv().get("LAVALINK_HOST");
+        String lavalinkPort = System.getenv().get("LAVALINK_PORT");
+
         this.musicManagers = new HashMap<>();
 
         this.lavalinkClient = new LavalinkClient(
@@ -37,7 +40,7 @@ public class PlayerManager {
 
         this.lavalinkClient.addNode(new NodeOptions.Builder()
                 .setName("main-node")
-                .setServerUri(URI.create("http://localhost:2333"))
+                .setServerUri(URI.create("http://" + lavalinkHost + ":" + lavalinkPort))
                 .setPassword("youshallnotpass")
                 .build()
         );
