@@ -2,6 +2,7 @@ services:
   lavalink:
     image: ghcr.io/lavalink-devs/lavalink:4-alpine
     container_name: lavalink
+    hostname: lavalink
     volumes:
       - ./lavalink-config:/opt/Lavalink/config
     environment:
@@ -16,6 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: undefined-bot
+    hostname: undefined-bot
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
