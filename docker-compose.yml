@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
-      - LAVALINK_HOST=${LAVALINK_TOKEN}
+      - LAVALINK_HOST=${LAVALINK_HOST}
       - LAVALINK_PORT=${LAVALINK_PORT}
     restart: unless-stopped
     depends_on:
