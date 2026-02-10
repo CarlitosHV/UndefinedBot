@@ -29,10 +29,11 @@ services:
       - LAVALINK_PORT=2333
     restart: unless-stopped
     depends_on:
-      - lavalink
+      lavalink:
+        condition: service_healthy
     networks:
       - undefined-bot
 
 networks:
   undefined-bot:
-    driver: bridge
+    external: true
