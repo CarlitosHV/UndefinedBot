@@ -9,6 +9,8 @@ services:
       - _JAVA_OPTIONS=-Xmx6G
       - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
     restart: unless-stopped
+    networks:
+      - undefined-bot
 
   app:
     build:
@@ -28,3 +30,9 @@ services:
     restart: unless-stopped
     depends_on:
       - lavalink
+    networks:
+      - undefined-bot
+
+networks:
+  undefined-bot:
+    driver: bridge
