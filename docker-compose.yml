@@ -29,8 +29,7 @@ services:
       - LAVALINK_PORT=2333
     restart: unless-stopped
     depends_on:
-      lavalink:
-        condition: service_healthy
+      - lavalink
     networks:
       - undefined-bot
 
