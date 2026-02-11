@@ -10,6 +10,8 @@ import com.undefined.core.voice.VoiceIdleMonitor;
 import com.undefined.core.voice.VoiceConnectionManager;
 import com.undefined.events.MessageListener;
 import com.undefined.core.jda.JdaVoiceConnectionManager;
+import dev.arbjerg.lavalink.client.Helpers;
+import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.JDA;
@@ -42,13 +44,14 @@ public class Startup {
                 .build()
                 .awaitReady();
 
+        playerManager.connectLavalinkNodes();
+
         CommandHandler commandHandler = getCommandHandler(playerManager, config);
 
         jda.addEventListener(new MessageListener(config, commandHandler));
 
         System.out.println("Bot iniciado correctamente");
     }
-
 
     @NotNull
     private static CommandHandler getCommandHandler(PlayerManager playerManager, BotConfiguration config) {

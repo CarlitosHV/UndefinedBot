@@ -25,11 +25,10 @@ public class PlayerManager {
 
     private final LavalinkClient lavalinkClient;
     private final Map<Long, GuildAudioService> musicManagers;
+    private final BotConfiguration config;
 
     private PlayerManager(BotConfiguration config) {
-        String lavalinkHost = System.getenv().get("LAVALINK_HOST");
-        String lavalinkPort = System.getenv().get("LAVALINK_PORT");
-
+        this.config = config;
         this.musicManagers = new HashMap<>();
 
         this.lavalinkClient = new LavalinkClient(
@@ -38,12 +37,7 @@ public class PlayerManager {
 
         this.lavalinkClient.getLoadBalancer().addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
-        this.lavalinkClient.addNode(new NodeOptions.Builder()
-                .setName("main-node")
-                .setServerUri(URI.create("http://" + lavalinkHost + ":" + lavalinkPort))
-                .setPassword("youshallnotpass")
-                .build()
-        );
+        // NO conectar nodos aquí todavía
 
         this.lavalinkClient.on(dev.arbjerg.lavalink.client.event.TrackStartEvent.class).subscribe(event -> {
             GuildAudioService service = musicManagers.get(event.getGuildId());
@@ -58,6 +52,20 @@ public class PlayerManager {
                 service.getScheduler().onTrackEnd(event.getTrack(), event.getEndReason());
             }
         });
+    }
+
+    public void connectLavalinkNodes() {
+        String lavalinkHost = System.getenv().get("LAVALINK_HOST");
+        String lavalinkPort = System.getenv().get("LAVALINK_PORT");
+
+        this.lavalinkClient.addNode(new NodeOptions.Builder()
+                .setName("main-node")
+                .setServerUri(URI.create("http://" + lavalinkHost + ":" + lavalinkPort))
+                .setPassword("youshallnotpass")
+                .build()
+        );
+
+        System.out.println("Nodo de Lavalink conectado correctamente");
     }
 
     private long getUserIdFromConfig(BotConfiguration config) {
