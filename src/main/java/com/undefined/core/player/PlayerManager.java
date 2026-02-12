@@ -37,8 +37,6 @@ public class PlayerManager {
 
         this.lavalinkClient.getLoadBalancer().addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
-        // NO conectar nodos aquí todavía
-
         this.lavalinkClient.on(dev.arbjerg.lavalink.client.event.TrackStartEvent.class).subscribe(event -> {
             GuildAudioService service = musicManagers.get(event.getGuildId());
             if (service != null) {
