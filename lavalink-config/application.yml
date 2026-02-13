@@ -14,19 +14,20 @@ lavalink:
       vimeo: true
       nico: true
       local: false
-    bufferDurationMs: 800
-    frameBufferDurationMs: 10000
+    bufferDurationMs: 2000
+    frameBufferDurationMs: 20000
     opusEncodingQuality: 10
     resamplingQuality: HIGH
     youtubePlaylistLoadLimit: 6
-    playerUpdateInterval: 5
+    playerUpdateInterval: 3
     youtubeSearchEnabled: true
     soundcloudSearchEnabled: true
     gc-warnings: true
     youtube:
       clients:
-        - "MUSIC"
+        - "ANDROID_TESTSUITE"
         - "ANDROID"
+        - "WEB"
       oauth:
         refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
   plugins:
@@ -48,8 +49,10 @@ plugins:
       - "ytsearch:\"%ISRC%\""
       - "ytmsearch:%QUERY%"
       - "ytsearch:%QUERY%"
+      - "scsearch:%QUERY%"
     sources:
       spotify: true
+      soundcloud: true
     spotify:
       clientId: "${SPOTIFY_CLIENT_ID}"
       clientSecret: "${SPOTIFY_CLIENT_SECRET}"
