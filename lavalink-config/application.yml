@@ -29,7 +29,9 @@ lavalink:
         - "ANDROID"
         - "WEB"
       oauth:
+        enabled: true
         refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
+        skipInitialization: false
   plugins:
     - name: "youtube"
       dependency: "dev.lavalink.youtube:youtube-plugin:1.17.0"
