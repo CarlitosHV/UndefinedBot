@@ -14,8 +14,8 @@ COPY src ./src
 
 RUN gradle shadowJar --no-daemon -x test
 
-##FROM eclipse-temurin:17-jre-alpine
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:17-jre-alpine
+#FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 

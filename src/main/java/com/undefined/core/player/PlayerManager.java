@@ -53,18 +53,41 @@ public class PlayerManager {
     }
 
     public void connectLavalinkNodes() {
-        String lavalinkHost = System.getenv().get("LAVALINK_HOST");
-        String lavalinkPort = System.getenv().get("LAVALINK_PORT");
+        String lavalinkHost = System.getenv("LAVALINK_HOST");
+        String lavalinkPort = System.getenv("LAVALINK_PORT");
+        String lavalinkPassword = System.getenv("LAVALINK_PASSWORD");
+
+        if (lavalinkHost == null || lavalinkHost.isEmpty()) {
+            lavalinkHost = "lavalink";
+            System.out.println("ADVERTENCIA: LAVALINK_HOST no definida, usando valor por defecto: " + lavalinkHost);
+        }
+
+        if (lavalinkPort == null || lavalinkPort.isEmpty()) {
+            lavalinkPort = "2333";
+            System.out.println("ADVERTENCIA: LAVALINK_PORT no definida, usando valor por defecto: " + lavalinkPort);
+        }
+
+        if (lavalinkPassword == null || lavalinkPassword.isEmpty()) {
+            lavalinkPassword = "youshallnotpass";
+            System.out.println("ADVERTENCIA: LAVALINK_PASSWORD no definida, usando valor por defecto");
+        }
+
+        System.out.println("Host lava: " + lavalinkHost);
+        System.out.println("Puerto lava: " + lavalinkPort);
+
+        String serverUri = "http://" + lavalinkHost + ":" + lavalinkPort;
+        System.out.println("URI completa de Lavalink: " + serverUri);
 
         this.lavalinkClient.addNode(new NodeOptions.Builder()
                 .setName("main-node")
-                .setServerUri(URI.create("http://" + lavalinkHost + ":" + lavalinkPort))
-                .setPassword("youshallnotpass")
+                .setServerUri(URI.create(serverUri))
+                .setPassword(lavalinkPassword)
                 .build()
         );
 
         System.out.println("Nodo de Lavalink conectado correctamente");
     }
+
 
     private long getUserIdFromConfig(BotConfiguration config) {
         try {

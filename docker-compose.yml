@@ -8,9 +8,17 @@ services:
     environment:
       - _JAVA_OPTIONS=-Xmx6G
       - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
     restart: unless-stopped
     networks:
       - undefined-bot
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --header='Authorization: youshallnotpass' http://localhost:2333/version || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   app:
     build:
@@ -25,16 +33,17 @@ services:
       - COMMAND_PREFIX=${COMMAND_PREFIX:-u$}
       - TIMEOUT_MINUTES=${TIMEOUT_MINUTES:-2}
       - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
-      - LAVALINK_HOST=${LAVALINK_HOST}
-      - LAVALINK_PORT=${LAVALINK_PORT}
-      - LAVALINK_PASSWORD=${LAVALINK_PASSWORD}
+      - LAVALINK_HOST=lavalink
+      - LAVALINK_PORT=2333
+      - LAVALINK_PASSWORD=youshallnotpass
       - ADDRESS=${ADDRESS}
     restart: unless-stopped
     depends_on:
-      - lavalink
+      lavalink:
+        condition: service_healthy
     networks:
       - undefined-bot
 
 networks:
   undefined-bot:
-    external: true
+    driver: bridge

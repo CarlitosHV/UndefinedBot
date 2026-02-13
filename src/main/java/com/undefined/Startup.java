@@ -6,20 +6,13 @@ import com.undefined.commands.basics.PingCommand;
 import com.undefined.commands.music.*;
 import com.undefined.config.BotConfiguration;
 import com.undefined.core.player.PlayerManager;
-import com.undefined.core.voice.VoiceIdleMonitor;
-import com.undefined.core.voice.VoiceConnectionManager;
 import com.undefined.events.MessageListener;
-import com.undefined.core.jda.JdaVoiceConnectionManager;
-import dev.arbjerg.lavalink.client.Helpers;
-import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.NotNull;
-
-import java.time.Duration;
 import java.util.List;
 
 public class Startup {
@@ -33,6 +26,8 @@ public class Startup {
 
         PlayerManager playerManager = PlayerManager.getInstance(config);
 
+        playerManager.connectLavalinkNodes();
+
         JDA jda = JDABuilder.createDefault(config.getDiscordToken())
                 .enableIntents(
                         GatewayIntent.MESSAGE_CONTENT,
@@ -43,8 +38,6 @@ public class Startup {
                 .setActivity(Activity.listening(config.getCommandPrefix() + "play"))
                 .build()
                 .awaitReady();
-
-        playerManager.connectLavalinkNodes();
 
         CommandHandler commandHandler = getCommandHandler(playerManager, config);
 
@@ -79,3 +72,4 @@ public class Startup {
         return commandHandler;
     }
 }
+
