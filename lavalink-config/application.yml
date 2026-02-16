@@ -43,7 +43,7 @@ plugins:
     clients:
       - MUSIC
       - WEB
-      - ANDROID
+      - ANDROID_MUSIC
       - IOS
       - TV
     oauth:
