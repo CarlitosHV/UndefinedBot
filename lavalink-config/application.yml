@@ -6,7 +6,7 @@ lavalink:
   server:
     password: "youshallnotpass"
     sources:
-      youtube: false
+      youtube: true
       http: true
       bandcamp: true
       soundcloud: true
@@ -23,29 +23,34 @@ lavalink:
     youtubeSearchEnabled: true
     soundcloudSearchEnabled: true
     gc-warnings: true
-    youtube:
-      clients:
-        - "ANDROID_TESTSUITE"
-        - "ANDROID"
-        - "WEB"
-      oauth:
-        enabled: true
-        refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
-        skipInitialization: false
+
   plugins:
-    - name: "youtube"
-      dependency: "dev.lavalink.youtube:youtube-plugin:1.17.0"
-
-    - name: "lavasrc"
-      dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.0.0-beta.7"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.17.0"
+      snapshot: false
+    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.0.0-beta.7"
       repository: "https://maven.topi.wtf/releases"
-
-    - name: "lavasearch"
-      dependency: "com.github.topi314.lavasearch:lavasearch-plugin:1.0.0-beta.2"
+    - dependency: "com.github.topi314.lavasearch:lavasearch-plugin:1.0.0-beta.2"
       repository: "https://maven.topi.wtf/releases"
 
 plugins:
-  directory: "/plugins"
+  youtube:
+    enabled: true
+    allowSearch: true
+    allowDirectVideoIds: true
+    allowDirectPlaylistIds: true
+
+    oauth:
+      enabled: true
+      refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
+      skipInitialization: false
+
+    clients:
+      - MUSIC
+      - WEB
+      - ANDROID_TESTSUITE
+      - TVHTML5EMBEDDED
+
+
   lavasrc:
     providers:
       - "ytsearch:\"%ISRC%\""
@@ -66,7 +71,7 @@ logging:
   level:
     root: INFO
     lavalink: INFO
-    dev.lavalink.youtube: INFO
+    dev.lavalink.youtube: DEBUG
   request:
     enabled: true
     includeClientInfo: true
