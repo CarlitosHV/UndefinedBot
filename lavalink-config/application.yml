@@ -43,6 +43,7 @@ plugins:
     clients:
       - IOS
       - TV
+      - MWEB
     oauth:
       enabled: true
       refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
