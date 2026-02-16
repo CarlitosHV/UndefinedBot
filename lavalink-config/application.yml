@@ -6,7 +6,7 @@ lavalink:
   server:
     password: "youshallnotpass"
     sources:
-      youtube: true
+      youtube: false
       http: true
       bandcamp: true
       soundcloud: true
@@ -46,7 +46,7 @@ plugins:
       - ANDROID_TESTSUITE
       - TVHTML5EMBEDDED
     oauth:
-      enabled: false
+      enabled: true
 
   lavasrc:
     providers:
