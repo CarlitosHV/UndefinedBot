@@ -42,7 +42,7 @@ plugins:
     allowDirectPlaylistIds: true
     clients:
       - TV
-      - TVHTML5EMBEDDED
+      - WEB
     oauth:
       enabled: true
       refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
