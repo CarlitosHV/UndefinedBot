@@ -42,7 +42,7 @@ plugins:
     allowDirectPlaylistIds: true
     clients:
       - IOS
-      - WEB
+      - TV
     oauth:
       enabled: true
       refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
