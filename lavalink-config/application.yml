@@ -48,6 +48,8 @@ plugins:
     oauth:
       enabled: true
       refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
+      clientId: "${GOOGLE_CLIENT_ID}"
+      clientSecret: "${GOOGLE_SECRET_ID}"
       skipInitialization: false
 
   lavasrc:
