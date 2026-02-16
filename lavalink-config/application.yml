@@ -4,6 +4,9 @@ server:
 
 lavalink:
   server:
+    httpConfig:
+      proxyHost: ""
+      proxyPort: 0
     password: "youshallnotpass"
     sources:
       youtube: false
