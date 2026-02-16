@@ -43,8 +43,9 @@ plugins:
     clients:
       - MUSIC
       - WEB
-      - ANDROID_TESTSUITE
-      - TVHTML5EMBEDDED
+      - ANDROID
+      - IOS
+      - TV
     oauth:
       enabled: true
 
