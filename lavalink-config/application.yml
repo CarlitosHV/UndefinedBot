@@ -42,8 +42,10 @@ plugins:
     allowDirectPlaylistIds: true
     clients:
       - TVHTML5_SIMPLY
+      - MUSIC
     oauth:
       enabled: true
+      refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
 
   lavasrc:
     providers:
