@@ -43,6 +43,7 @@ plugins:
     clients:
       - ANDROID_VR
       - MUSIC
+      - TV
     oauth:
       enabled: true
       refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
