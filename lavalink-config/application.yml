@@ -41,7 +41,7 @@ plugins:
     allowDirectVideoIds: true
     allowDirectPlaylistIds: true
     clients:
-      - MWEB
+      - ANDROID_MUSIC
       - IOS
       - TV
     oauth:
