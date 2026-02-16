@@ -4,9 +4,6 @@ server:
 
 lavalink:
   server:
-    httpConfig:
-      proxyHost: ""
-      proxyPort: 0
     password: "youshallnotpass"
     sources:
       youtube: false
@@ -45,7 +42,7 @@ plugins:
     allowDirectPlaylistIds: true
     clients:
       - MUSIC
-      - WEBEMBEDDED
+      - TVHTML5_SIMPLY
       - TV
     WEBEMBEDDED:
       playlistLoading: false
