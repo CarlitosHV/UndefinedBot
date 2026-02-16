@@ -46,11 +46,7 @@ plugins:
       - ANDROID_TESTSUITE
       - TVHTML5EMBEDDED
     oauth:
-      enabled: true
-      refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
-      clientId: "${GOOGLE_CLIENT_ID}"
-      clientSecret: "${GOOGLE_SECRET_ID}"
-      skipInitialization: false
+      enabled: false
 
   lavasrc:
     providers:
