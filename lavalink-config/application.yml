@@ -42,7 +42,6 @@ plugins:
     allowDirectPlaylistIds: true
     clients:
       - MUSIC
-      - ANDROID
       - TV
     WEBEMBEDDED:
       playlistLoading: false
