@@ -44,6 +44,11 @@ plugins:
       - MUSIC
       - WEBEMBEDDED
       - TV
+    WEBEMBEDDED:
+      playlistLoading: false
+      videoLoading: false
+      searching: false
+      playback: true
     oauth:
       enabled: true
       refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
