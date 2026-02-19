@@ -26,7 +26,7 @@ services:
       start_period: 60s
 
   proxy:
-    image: sameersbn/squid:3.5.27-2
+    image: ubuntu/squid
     container_name: lavalink-proxy
     restart: unless-stopped
     volumes:
