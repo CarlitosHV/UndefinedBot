@@ -12,7 +12,12 @@ services:
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
       - GOOGLE_SECRET_ID=${GOOGLE_SECRET_ID}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - HTTP_PROXY=http://proxy:3128
+      - HTTPS_PROXY=http://proxy:3128
     restart: unless-stopped
+    depends_on:
+      proxy:
+        condition: service_started
     networks:
       - undefined-bot
     healthcheck:
@@ -21,6 +26,15 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+
+  proxy:
+    image: sameersbn/squid:3.5.27-2
+    container_name: lavalink-proxy
+    restart: unless-stopped
+    volumes:
+      - ./squid.conf:/etc/squid/squid.conf:ro
+    networks:
+      - undefined-bot
 
   app:
     build:
