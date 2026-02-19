@@ -12,9 +12,6 @@ services:
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
       - GOOGLE_SECRET_ID=${GOOGLE_SECRET_ID}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - NO_PROXY="maven.topi.wtf,maven.org,*.github.com"
-      - HTTP_PROXY=http://proxy:3128
-      - HTTPS_PROXY=http://proxy:3128
     restart: unless-stopped
     depends_on:
       proxy:
