@@ -42,7 +42,7 @@ plugins:
     allowDirectPlaylistIds: true
     clients:
       - MUSIC
-      - WEB
+      - ANDROID_VR
       - TV
     httpConfig:
       proxyHost: "proxy"
