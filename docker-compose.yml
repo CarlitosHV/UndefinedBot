@@ -6,7 +6,7 @@ services:
     volumes:
       - ./lavalink-config:/opt/Lavalink/config
     environment:
-      - _JAVA_OPTIONS=-Xmx8G -Xms4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200
+      - _JAVA_OPTIONS=-Xmx8G -Xms4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=3128 -Dhttps.proxyHost=proxy -Dhttps.proxyPort=3128 -Dhttps.proxySet=true -Dhttp.proxySet=true
       - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
