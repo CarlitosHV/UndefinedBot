@@ -33,14 +33,6 @@ services:
     networks:
       - undefined-bot
 
-    pot-generator:
-      image: node:22-alpine
-      container_name: pot-generator
-      network_mode: bridge
-      command: >
-        sh -c "npm install -g youtube-po-token-generator 2>/dev/null &&
-               npx youtube-po-token-generator"
-
   app:
     build:
       context: .
