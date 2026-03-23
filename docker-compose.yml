@@ -33,10 +33,12 @@ services:
     networks:
       - undefined-bot
 
-  pot-generator:
-    image: quay.io/invidious/youtube-trusted-session-generator
-    container_name: pot-generator
-    network_mode: bridge
+    pot-generator:
+      image: quay.io/invidious/youtube-trusted-session-generator
+      container_name: pot-generator
+      network_mode: bridge
+      environment:
+        - CHROMIUM_FLAGS=--no-sandbox
 
   app:
     build:
