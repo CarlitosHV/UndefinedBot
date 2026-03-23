@@ -7,8 +7,7 @@ services:
       - ./lavalink-config:/opt/Lavalink/config
     environment:
       - _JAVA_OPTIONS=-Xmx8G -Xms4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200
-      - PO_TOKEN=${PO_TOKEN}
-      - VISITOR_DATA=${VISITOR_DATA}
+      - YOUTUBE_REFRESH_TOKEN=${YOUTUBE_REFRESH_TOKEN}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
     restart: unless-stopped
