@@ -50,10 +50,6 @@ plugins:
     httpConfig:
       proxyHost: "proxy"
       proxyPort: 3128
-    oauth:
-      enabled: true
-      refreshToken: "${YOUTUBE_REFRESH_TOKEN}"
-      skipInitialization: true
 
   lavasrc:
     providers:
