@@ -36,8 +36,7 @@ services:
   pot-generator:
     image: quay.io/invidious/youtube-trusted-session-generator
     container_name: pot-generator
-    networks:
-      - undefined-bot
+    network_mode: bridge
 
   app:
     build:
