@@ -37,6 +37,9 @@ lavalink:
 plugins:
   youtube:
     enabled: true
+    pot:
+      token: "${PO_TOKEN}"
+      visitorData: "${VISITOR_DATA}"
     allowSearch: true
     allowDirectVideoIds: true
     allowDirectPlaylistIds: true
