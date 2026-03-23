@@ -25,8 +25,8 @@ lavalink:
     gc-warnings: true
 
   plugins:
-    - dependency: "dev.lavalink.youtube:youtube-plugin:8db4e5dc023bedcc2a39a219e22e0637105d05d5"
-      snapshot: true
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.17.0"
+      snapshot: false
     - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.8.1"
       repository: "https://maven.topi.wtf/releases"
       snapshot: false
