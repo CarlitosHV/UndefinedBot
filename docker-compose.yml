@@ -34,11 +34,12 @@ services:
       - undefined-bot
 
     pot-generator:
-      image: quay.io/invidious/youtube-trusted-session-generator
+      image: node:22-alpine
       container_name: pot-generator
       network_mode: bridge
-      environment:
-        - CHROMIUM_FLAGS=--no-sandbox
+      command: >
+        sh -c "npm install -g youtube-po-token-generator 2>/dev/null &&
+               npx youtube-po-token-generator"
 
   app:
     build:
